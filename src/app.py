@@ -115,14 +115,23 @@ def post_products():
     product_desc = request.json.get('product_desc')
     product_brand = request.json.get('product_brand')
     product_price = request.json.get('product_price')
-    product_type = request.json.get('product_type')
+    product_type_id = request.json.get('product_type_id')
 
+    verify_name = Products.query.filter_by(product_name=product_name).first()
+    #print(verify_name)
+    if verify_name: 
+        verify_brand = Products.query.filter_by(product_brand=product_brand).first()
+        #print(verify_brand)
+        if verify_brand:
+            return jsonify({"status": True, "msg": "Product already exists"}), 404
+    
+    
     product = Products()
     product.product_name = product_name
     product.product_desc = product_desc
     product.product_brand = product_brand
     product.product_price = product_price
-    product.product_type = product_type
+    product.product_type_id = product_type_id
     product.save()
 
     return jsonify(product.serialize()), 201
@@ -130,18 +139,11 @@ def post_products():
 @app.route('/api/products/<int:id>', methods=['PUT'])
 def put_product(id):
 
-    product_name = request.json.get('product_name')
-    product_desc = request.json.get('product_desc')
-    product_brand = request.json.get('product_brand')
+    #solo se deberia poder cambiar el precio
     product_price = request.json.get('product_price')
-    product_type = request.json.get('product_type')
 
     products = Products.query.get(id)
-    products.product_name = product_name
-    products.product_desc = product_desc
-    products.product_brand = product_brand
     products.product_price = product_price
-    products.product_type = product_type
     products.update()
 
     return jsonify(products.serialize()), 200    
@@ -202,6 +204,91 @@ def delete_product_type(id):
     product_type.delete()
 
     return jsonify({"status": True, "msg": "Product Type deleted"}), 200
+
+@app.route('/api/services', methods=['GET'])
+def get_services():
+    services = Services.query.all()
+    services = list(map(lambda services: services.serialize(), services))
+    return jsonify(services), 200
+
+@app.route('/api/services/<int:id>', methods=['GET'])
+def get_services_id(id):
+    
+    service = Services.query.get(id)
+    if not service: return jsonify({"status": False, "msg": "Service doesn't exist"}), 404
+    return jsonify(service.serialize()), 200
+
+@app.route('/api/services', methods=['POST'])
+def post_services():
+
+    service_name = request.json.get('service_name')
+    service_desc = request.json.get('service_desc')
+
+    verify_service = Services.query.filter_by(service_name=service_name).first()
+    if verify_service: return jsonify({"status": True, "msg": "Service already exists"}), 404
+
+    service = Services()
+    service.service_name = service_name
+    service.service_desc = service_desc
+    service.save()
+
+    return jsonify(service.serialize()), 201
+
+@app.route('/api/services/<int:id>', methods=['PUT'])
+def put_services(id):
+
+    service_name = request.json.get('service_name')
+    service_desc = request.json.get('service_desc')
+
+    service = Services.query.get(id)
+    service.service_name = service_name
+    service.service_desc = service_desc
+    service.update()
+
+    return jsonify(service.serialize()), 200
+
+@app.route('/api/services/<int:id>', methods=['DELETE'])
+def delete_services(id):
+
+    service = Services.query.get(id)
+
+    if not service: return jsonify({"status": False, "msg": "Services doesn't exist"}), 404
+
+    service.delete()
+
+    return jsonify({"status": True, "msg": "Service deleted"}), 200
+
+@app.route('/api/shopping_card', methods=['GET'])
+def get_shopping_card():
+    shopping_card = Shopping_Card.query.all()
+    shopping_card = list(map(lambda shopping_card: shopping_card.serialize(), shopping_card))
+    return jsonify(shopping_card), 200
+
+@app.route('/api/shopping_card', methods=['POST'])
+def post_shopping_card():
+
+    shop_user_id = request.json.get('shop_user_id')
+    shop_product_id = request.json.get('shop_product_id')
+    shop_service_id = request.json.get('shop_service_id')
+
+    shopping_card = Shopping_Card()
+    shopping_card.shop_user_id = shop_user_id
+    shopping_card.shop_product_id = shop_product_id
+    shopping_card.shop_service_id = shop_service_id
+    shopping_card.save()
+
+    return jsonify(shopping_card.serialize()), 201
+
+@app.route('/api/shopping_card/<int:id>', methods=['DELETE'])
+def delete_shopping_card(id):
+
+    shopping_card = Shopping_Card.query.get(id)
+
+    if not shopping_card: return jsonify({"status": False, "msg": "Shopping Card ID doesn't exist"}), 404
+
+    shopping_card.delete()
+
+    return jsonify({"status": True, "msg": "Shopping Card ID deleted"}), 200
 
 
 

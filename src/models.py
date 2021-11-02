@@ -37,7 +37,8 @@ class Products(db.Model):
     product_desc = db.Column(db.String(150))
     product_brand = db.Column(db.String(100))
     product_price = db.Column(db.Integer(), nullable=False)
-    product_type = db.Column(db.String(100), nullable=False)
+    product_type_id = db.Column(db.Integer, db.ForeignKey("products_type.type_id", ondelete='CASCADE'), nullable=False)
+    #product_type = db.Column(db.String(100), nullable=False)
 
     def serialize(self):
         return {
@@ -46,7 +47,7 @@ class Products(db.Model):
             "product_desc": self.product_desc,
             "product_brand": self.product_brand,
             "product_price": self.product_price,
-            "product_type": self.product_type
+            "product_type_name": self.products_type.type_name #traemos de la tabla products type el tipo de producto (repuesto / accesorio)
         }
 
     def save(self):
@@ -64,6 +65,7 @@ class Products_Type(db.Model):
     __tablename__ = 'products_type'
     type_id = db.Column(db.Integer(), primary_key=True)
     type_name = db.Column(db.String(50), nullable=False)
+    products = db.relationship("Products", cascade="all, delete", backref="products_type")
 
     def serialize(self):
         return {
