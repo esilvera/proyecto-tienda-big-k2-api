@@ -44,7 +44,8 @@ def register():
     user.user_role = user_role
     user.save()
 
-    return jsonify({"msg": "Usuario registrado, por favor inicie sesion"}), 201
+    return jsonify({"msg": "REGISTRO EXITOSO, por favor inicie sesion"}), 201
+    #return jsonify(), 201
 
 @app.route("/api/login", methods=['POST'])
 def login():
@@ -58,10 +59,11 @@ def login():
     if not check_password_hash(user.user_password, user_password): 
         return jsonify({"msg": "Usuario/Password no se encuentran."}), 400
 
-    expire = datetime.timedelta(minutes=5)
-    print(expire)
+    expire = datetime.timedelta(days=99)
+    print(expire)  # Imprime en la consola el tiempo de expiracion del Token
 
     access_token = create_access_token(identity=user.user_email, expires_delta=expire)
+    print("Acces Token: ", access_token)   # Imprime en consola el acces token para poder revisar el profile
 
     data = {
         "access_token": access_token,
@@ -139,11 +141,18 @@ def post_products():
 @app.route('/api/products/<int:id>', methods=['PUT'])
 def put_product(id):
 
-    #solo se deberia poder cambiar el precio
+    product_name = request.json.get('product_name')
+    product_desc = request.json.get('product_desc')
+    product_brand = request.json.get('product_brand')
     product_price = request.json.get('product_price')
+    product_type_id = request.json.get('product_type_id')
 
     products = Products.query.get(id)
+    products.product_name = product_name
+    products.product_desc = product_desc
+    products.product_brand = product_brand
     products.product_price = product_price
+    products.product_type_id = product_type_id
     products.update()
 
     return jsonify(products.serialize()), 200    
