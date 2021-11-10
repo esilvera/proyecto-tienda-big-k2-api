@@ -232,6 +232,7 @@ def post_services():
 
     service_name = request.json.get('service_name')
     service_desc = request.json.get('service_desc')
+    service_icon = request.json.get('service_icon')
 
     verify_service = Services.query.filter_by(service_name=service_name).first()
     if verify_service: return jsonify({"status": True, "msg": "Service already exists"}), 404
@@ -239,6 +240,7 @@ def post_services():
     service = Services()
     service.service_name = service_name
     service.service_desc = service_desc
+    service.service_icon = service_icon
     service.save()
 
     return jsonify(service.serialize()), 201
@@ -248,10 +250,12 @@ def put_services(id):
 
     service_name = request.json.get('service_name')
     service_desc = request.json.get('service_desc')
+    service_icon = request.json.get('service_icon')
 
     service = Services.query.get(id)
     service.service_name = service_name
     service.service_desc = service_desc
+    service.service_icon = service_icon
     service.update()
 
     return jsonify(service.serialize()), 200

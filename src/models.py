@@ -89,12 +89,14 @@ class Services(db.Model):
     service_id = db.Column(db.Integer(), primary_key=True)
     service_name = db.Column(db.String(50), nullable=False)
     service_desc = db.Column(db.String(150))
+    service_icon = db.Column(db.String(50))
 
     def serialize(self):
         return {
             "service_id": self.service_id,
             "service_name": self.service_name,
-            "service_desc": self.service_desc
+            "service_desc": self.service_desc,
+            "service_icon": self.service_icon
         }
 
     def save(self):
